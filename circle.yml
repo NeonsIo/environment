@@ -4,11 +4,9 @@ machine:
   services:
     - docker
 
-dependencies:
-  override:
-    - sudo pip install --upgrade docker-compose==1.11.2
-
 test:
   pre:
     - docker-compose build
     - docker-compose up -d
+  post:
+    - docker ps -a

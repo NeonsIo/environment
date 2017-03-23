@@ -32,4 +32,4 @@ RUN sh get-artifact.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["/usr/bin/scala", "/collector.jar"]
+CMD ["java", "-jar", "/collector.jar"]

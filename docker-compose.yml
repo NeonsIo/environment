@@ -11,6 +11,9 @@ services:
       - 8080:80
     depends_on:
       - redis
+    volumes:
+      - ./logs/collector:/logs
+    tty: true
     networks:
       neons:
         ipv4_address: 10.0.0.10
