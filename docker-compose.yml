@@ -10,7 +10,8 @@ services:
     ports:
       - 8080:80
     depends_on:
-      - redis
+      - zookeeper
+      - kafka
     volumes:
       - ./logs/collector:/logs
     tty: true
@@ -18,14 +19,30 @@ services:
       neons:
         ipv4_address: 10.0.0.10
 
-  redis:
-    container_name: redis
-    image: redis
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper
+    env_file: .env
     ports:
-      - 6379:6379
+      - 2181:2181
     networks:
       neons:
         ipv4_address: 10.0.0.11
+
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    env_file: .env
+    ports:
+      - 9092:9092
+      - 9999:9999
+    depends_on:
+      - zookeeper
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      neons:
+        ipv4_address: 10.0.0.12
 
 networks:
   neons:
