@@ -10,6 +10,10 @@ services:
     depends_on:
       - collector-1
       - collector-2
+    volumes:
+      - ./lb/haproxy:/usr/local/etc/haproxy
+      - ./lb/rsyslog:/etc/rsyslog.d
+      - ./lb/ssl:/etc/ssl/default
     networks:
       neons:
         ipv4_address: 10.0.0.10
