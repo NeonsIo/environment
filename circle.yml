@@ -11,8 +11,7 @@ machine:
 
 test:
   pre:
-    - cd development
-    - docker-compose build
-    - docker-compose up -d
+    - cd development && docker-compose build
+    - cd development && docker-compose up -d
   post:
     - docker ps -a
