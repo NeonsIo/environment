@@ -3,7 +3,7 @@ version: "2"
 services:
   lb:
     container_name: lb
-    build: lb
+    image: neons/load-balancer:0.0.1
     ports:
       - 80:80
       - 443:443
@@ -116,6 +116,7 @@ services:
         ipv4_address: 10.0.0.34
 
   jobmanager:
+    container_name: jobmanager
     image: flink:latest
     ports:
       - 8081:8081
@@ -151,6 +152,17 @@ services:
     networks:
       neons:
         ipv4_address: 10.0.0.42
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer
+    ports:
+      - 8082:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      neons:
+        ipv4_address: 10.0.0.50
 
 networks:
   neons:
