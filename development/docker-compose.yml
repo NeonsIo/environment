@@ -20,7 +20,7 @@ services:
 
   collector-1:
     container_name: collector-1
-    image: neons/collector:1.0.3
+    image: neons/collector:1.0.4
     environment:
       - COLLECTOR_SINK_KAFKA_HOST=10.0.0.32
       - COLLECTOR_SINK_KAFKA_PORT=9092
@@ -37,7 +37,7 @@ services:
 
   collector-2:
     container_name: collector-2
-    image: neons/collector:1.0.3
+    image: neons/collector:1.0.4
     environment:
       - COLLECTOR_SINK_KAFKA_HOST=10.0.0.32
       - COLLECTOR_SINK_KAFKA_PORT=9092
@@ -115,63 +115,97 @@ services:
       neons:
         ipv4_address: 10.0.0.34
 
-  jobmanager:
-    container_name: jobmanager
-    image: neons/streamer:0.0.7
-    ports:
-      - 8081:8081
-    command: jobmanager
-    environment:
-      - JOB_MANAGER_RPC_ADDRESS=10.0.0.40
-      - ELASTICSEARCH_HOST1=10.0.0.33
-      - ELASTICSEARCH_PORT1=9300
-      - KAFKA_SERVER=10.0.0.32:9092
-    networks:
-      neons:
-        ipv4_address: 10.0.0.40
+#  jobmanager:
+#    container_name: jobmanager
+#    image: neons/streamer:0.0.8
+#    ports:
+#      - 8081:8081
+#    command: jobmanager
+#    environment:
+#      - JOB_MANAGER_RPC_ADDRESS=10.0.0.40
+#      - ELASTICSEARCH_HOST1=10.0.0.33
+#      - ELASTICSEARCH_PORT1=9300
+#      - KAFKA_SERVER=10.0.0.32:9092
+#    networks:
+#      neons:
+#        ipv4_address: 10.0.0.40
+#
+#  taskmanager-1:
+#    container_name: taskmanager-1
+#    image: neons/streamer:0.0.8
+#    environment:
+#      - JOB_MANAGER_RPC_ADDRESS=10.0.0.40
+#      - ELASTICSEARCH_HOST1=10.0.0.33
+#      - ELASTICSEARCH_PORT1=9300
+#      - KAFKA_SERVER=10.0.0.32:9092
+#    depends_on:
+#      - jobmanager
+#      - elasticsearch
+#    command: taskmanager
+#    networks:
+#      neons:
+#        ipv4_address: 10.0.0.41
+#
+#  taskmanager-2:
+#    container_name: taskmanager-2
+#    image: neons/streamer:0.0.8
+#    environment:
+#      - JOB_MANAGER_RPC_ADDRESS=10.0.0.40
+#      - ELASTICSEARCH_HOST1=10.0.0.33
+#      - ELASTICSEARCH_PORT1=9300
+#      - KAFKA_SERVER=10.0.0.32:9092
+#    depends_on:
+#      - jobmanager
+#      - elasticsearch
+#    command: taskmanager
+#    networks:
+#      neons:
+#        ipv4_address: 10.0.0.42
+#
+#  portainer:
+#    container_name: portainer
+#    image: portainer/portainer
+#    ports:
+#      - 8082:9000
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    networks:
+#      neons:
+#        ipv4_address: 10.0.0.50
 
-  taskmanager-1:
-    container_name: taskmanager-1
-    image: neons/streamer:0.0.7
-    environment:
-      - JOB_MANAGER_RPC_ADDRESS=10.0.0.40
-      - ELASTICSEARCH_HOST1=10.0.0.33
-      - ELASTICSEARCH_PORT1=9300
-      - KAFKA_SERVER=10.0.0.32:9092
-    depends_on:
-      - jobmanager
-      - elasticsearch
-    command: taskmanager
+  cassandra-1:
+    container_name: cassandra-1
+    image: cassandra:latest
+    command: /bin/bash -c "sleep 1 && echo ' -- Pausing to let system catch up ... -->' && /docker-entrypoint.sh cassandra -f"
+    expose:
+      - 7000
+      - 7001
+      - 7199
+      - 9042
+      - 9160
     networks:
       neons:
-        ipv4_address: 10.0.0.41
+        ipv4_address: 10.0.0.60
+    # volumes: # uncomment if you desire mounts, also uncomment cluster.sh
+    #   - ./data/cassandra-1:/var/lib/cassandra:rw
 
-  taskmanager-2:
-    container_name: taskmanager-2
-    image: neons/streamer:0.0.7
+  cassandra-2:
+    container_name: cassandra-2
+    image: cassandra:latest
+    command: /bin/bash -c "sleep 30 && echo ' -- Pausing to let system catch up ... -->' && /docker-entrypoint.sh cassandra -f"
     environment:
-      - JOB_MANAGER_RPC_ADDRESS=10.0.0.40
-      - ELASTICSEARCH_HOST1=10.0.0.33
-      - ELASTICSEARCH_PORT1=9300
-      - KAFKA_SERVER=10.0.0.32:9092
-    depends_on:
-      - jobmanager
-      - elasticsearch
-    command: taskmanager
+      - CASSANDRA_SEEDS=cassandra-1
+    links:
+      - cassandra-1
+    expose:
+      - 7000
+      - 7001
+      - 7199
+      - 9042
+      - 9160
     networks:
       neons:
-        ipv4_address: 10.0.0.42
-
-  portainer:
-    container_name: portainer
-    image: portainer/portainer
-    ports:
-      - 8082:9000
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      neons:
-        ipv4_address: 10.0.0.50
+        ipv4_address: 10.0.0.61
 
 networks:
   neons:
